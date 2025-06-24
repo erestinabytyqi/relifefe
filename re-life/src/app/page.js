@@ -18,17 +18,8 @@ export default function HomePage() {
   }, [user, role, loading]);
 
   if (loading) {
-    return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh'
-      }}>
-        <Spin tip="Loading..." size="large" />
-      </div>
-    );
+    return <Spin tip="Loading..." size="large" fullscreen />;
   }
 
-  return null; // Once loading is done, let useEffect handle redirection
+  return null;
 }

@@ -2,11 +2,9 @@
 
 import { useState } from 'react';
 import {
-  Form, Input, Select, Button, Typography, message
+  Form, Input, Select, Button, Typography
 } from 'antd';
-import { auth, db } from '../../../lib/firebase';
-import { doc, setDoc } from 'firebase/firestore';
-import { createUserWithEmailAndPassword } from 'firebase/auth'; // ✅ missing import added
+import toast from 'react-hot-toast';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -14,28 +12,27 @@ const { Option } = Select;
 export default function CreateUserPage() {
   const [loading, setLoading] = useState(false);
 
-const onFinish = async ({ email, role }) => {
-  setLoading(true);
+  const onFinish = async ({ email, role }) => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/create-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, role }),
+      });
 
-  try {
-    const res = await fetch('/api/create-user', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, role }),
-    });
+      const data = await res.json();
 
-    const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to create user');
 
-    if (!res.ok) throw new Error(data.error || 'Failed to create user');
-
-    message.success('User created and email sent!');
-  } catch (error) {
-    console.error(error);
-    message.error(error.message);
-  } finally {
-    setLoading(false);
-  }
-};
+      toast.success('User created and email sent!');
+    } catch (error) {
+      console.error(error);
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div style={{ maxWidth: 500 }}>

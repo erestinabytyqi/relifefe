@@ -68,21 +68,27 @@ const handleDeleteUser = async (user) => {
     const res = await fetch('/api/delete-auth-user', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json', // ✅ this is the missing part
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ uid: user.id }), // ✅ user.id = UID = Firestore doc ID
+      body: JSON.stringify({ uid: user.id }),
     });
 
-    if (!res.ok) throw new Error('Failed to delete from Auth');
+    if (!res.ok) {
+      const errorText = await res.text(); // 🔍 Log error body from API
+      console.error('Auth deletion error:', errorText); // ✅ this shows real error reason
+      throw new Error('Failed to delete from Auth');
+    }
 
-    await deleteDoc(doc(db, 'users', user.id)); // Firestore delete
-    setDoctors(prev => prev.filter(d => d.id !== user.id)); // or setNurses(...)
+    await deleteDoc(doc(db, 'users', user.id));
+    setDoctors(prev => prev.filter(d => d.id !== user.id));
     message.success('User deleted from Auth and Firestore.');
   } catch (err) {
     console.error(err);
     message.error('Failed to delete user.');
   }
 };
+
+
   const columns = [
     { title: 'Email', dataIndex: 'email', key: 'email' },
     {
@@ -116,7 +122,7 @@ const handleDeleteUser = async (user) => {
           <Button
             icon={<DeleteOutlined />}
             danger
-            onClick={() => handleDeleteUser(record.id)}
+            onClick={() => handleDeleteUser(record)}
           />
         </Tooltip>
       ),

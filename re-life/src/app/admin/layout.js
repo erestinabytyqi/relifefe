@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Navbar from '../../components/Navbar';
 import AdminSidebar from '../../components/AdminSidebar';
+import { App as AntdApp, ConfigProvider } from 'antd';
 
 export default function AdminLayout({ children }) {
   const { role, user, loading } = useAuth();
@@ -20,12 +21,14 @@ export default function AdminLayout({ children }) {
   if (loading || !user || role !== 'admin') return <p>Checking access...</p>;
 
   return (
-    <>
-      <Navbar />
-      <div className="flex">
-        <AdminSidebar />
-        <main className="flex-1 p-6">{children}</main>
-      </div>
-    </>
+    <ConfigProvider>
+      <AntdApp>
+        <Navbar />
+        <div className="flex">
+          <AdminSidebar />
+          <main className="flex-1 p-6">{children}</main>
+        </div>
+      </AntdApp>
+    </ConfigProvider>
   );
 }
