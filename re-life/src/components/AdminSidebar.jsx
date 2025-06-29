@@ -12,6 +12,10 @@ import {
   MedicineBoxOutlined,
   HomeOutlined,
   ToolOutlined,
+  PlusSquareOutlined,
+  UnorderedListOutlined,
+  FileSearchOutlined,
+  FileAddOutlined,
 } from '@ant-design/icons';
 
 const { Sider } = Layout;
@@ -23,21 +27,22 @@ export default function AdminSidebar() {
     {
       type: 'group',
       label: 'Administrative Tasks',
-      children: [
+      children: [ 
+         { key: 'reports', icon: <FileTextOutlined />, label: 'Reports' },
         { key: 'create-user', icon: <UserAddOutlined />, label: 'Create User' },
         { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },
-        { key: 'reports', icon: <FileTextOutlined />, label: 'Reports' },
       ],
     },
     {
       type: 'group',
       label: 'Medical Tasks',
       children: [
-        { key: 'allergies', icon: <MedicineBoxOutlined />, label: 'Register Allergies' },
-        { key: 'getAllergies', icon: <MedicineBoxOutlined />, label: 'Get Allergies' },
-       { key: 'getMedications', icon: <MedicineBoxOutlined />, label: 'Get Medications' },
-     
-      ],
+       { key: 'allergies', icon: <PlusSquareOutlined />, label: 'Register Allergies' },
+      { key: 'getAllergies', icon: <UnorderedListOutlined />, label: 'Get Allergies' },
+      { key: 'getMedications', icon: <FileSearchOutlined />, label: 'Get Medications' },
+      { key: 'diagnosis', icon: <FileAddOutlined />, label: 'Register Diagnosis' },
+      { key: 'getDiagnosis', icon: <UnorderedListOutlined />, label: 'Get Diagnosis' },
+     ],
     },
     {
       type: 'group',

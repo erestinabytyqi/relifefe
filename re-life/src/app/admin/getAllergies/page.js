@@ -13,7 +13,8 @@ import {
   Input,
   Card,
   Tooltip,
-  Popover
+  Popover,
+  Modal as DefaultModal,
 } from 'antd';
 import {
   DeleteOutlined,
@@ -28,6 +29,8 @@ export default function AllergyListPage() {
   const [allergies, setAllergies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentAllergy, setCurrentAllergy] = useState(null);
 
   const fetchAllergies = async () => {
     setLoading(true);
@@ -80,8 +83,31 @@ export default function AllergyListPage() {
   };
 
   const handleEdit = (record) => {
-    toast('Edit functionality coming soon!');
-    // or route to edit form with router.push(`/admin/allergies/edit/${record.id}`)
+    setCurrentAllergy(record);
+    setIsModalOpen(true);
+  };
+
+  const handleModalOk = async () => {
+    try {
+      const updated = {
+        ...currentAllergy,
+        registerdDate: currentAllergy.registerdDate // Keep original register date
+      };
+      const res = await fetch(`https://localhost:7023/api/AllergiesLists/${updated.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated),
+      });
+      if (!res.ok) throw new Error();
+      toast.success('Allergy updated');
+      setAllergies(prev =>
+        prev.map(a => (a.id === updated.id ? { ...updated } : a))
+      );
+      setIsModalOpen(false);
+      setCurrentAllergy(null);
+    } catch {
+      toast.error('Update failed');
+    }
   };
 
   const renderTags = arr =>
@@ -118,50 +144,39 @@ export default function AllergyListPage() {
       title: 'Registered',
       dataIndex: 'registerdDate',
       key: 'registerdDate',
-      
       render: val => new Date(val).toLocaleDateString(),
     },
     {
-  title: 'Description',
-  dataIndex: 'description',
-  key: 'description',
-  width:100,
-  render: text => (
-    <Popover content={text} title="Description">
-      <Paragraph ellipsis={{ rows: 1 }}>{text}</Paragraph>
-    </Popover>
-  ),
-},
-   {
-  title: 'Symptoms',
-  dataIndex: 'symptoms',
-  key: 'symptoms',
-  render: arr => (
-    <Popover content={<div>{arr.join(', ')}</div>} title="Symptoms">
-      <Paragraph ellipsis={{ rows: 1 }}>{arr.join(', ')}</Paragraph>
-    </Popover>
-  ),
-},
-  {
-  title: 'Triggers',
-  dataIndex: 'triggers',
-  key: 'triggers',
-  render: arr => (
-    <Popover content={<div>{arr.join(', ')}</div>} title="Triggers">
-      <Paragraph ellipsis={{ rows: 1 }}>{arr.join(', ')}</Paragraph>
-    </Popover>
-  ),
-},
-   {
-  title: 'Triggers',
-  dataIndex: 'triggers',
-  key: 'triggers',
-  render: arr => (
-    <Popover content={<div>{arr.join(', ')}</div>} title="Triggers">
-      <Paragraph ellipsis={{ rows: 1 }}>{arr.join(', ')}</Paragraph>
-    </Popover>
-  ),
-},
+      title: 'Description',
+      dataIndex: 'description',
+      key: 'description',
+      width: 100,
+      render: text => (
+        <Popover content={text} title="Description">
+          <Paragraph ellipsis={{ rows: 1 }}>{text}</Paragraph>
+        </Popover>
+      ),
+    },
+    {
+      title: 'Symptoms',
+      dataIndex: 'symptoms',
+      key: 'symptoms',
+      render: arr => (
+        <Popover content={<div>{arr.join(', ')}</div>} title="Symptoms">
+          <Paragraph ellipsis={{ rows: 1 }}>{arr.join(', ')}</Paragraph>
+        </Popover>
+      ),
+    },
+    {
+      title: 'Triggers',
+      dataIndex: 'triggers',
+      key: 'triggers',
+      render: arr => (
+        <Popover content={<div>{arr.join(', ')}</div>} title="Triggers">
+          <Paragraph ellipsis={{ rows: 1 }}>{arr.join(', ')}</Paragraph>
+        </Popover>
+      ),
+    },
     {
       title: 'Actions',
       key: 'actions',
@@ -182,11 +197,7 @@ export default function AllergyListPage() {
             cancelText="No"
           >
             <Tooltip title="Delete">
-              <Button
-                type="text"
-                danger
-                icon={<DeleteOutlined />}
-              />
+              <Button type="text" danger icon={<DeleteOutlined />} />
             </Tooltip>
           </Popconfirm>
         </Space>
@@ -222,6 +233,64 @@ export default function AllergyListPage() {
           />
         )}
       </Card>
+
+      <DefaultModal
+        title="Edit Allergy"
+        open={isModalOpen}
+        onOk={handleModalOk}
+        onCancel={() => setIsModalOpen(false)}
+      >
+        {currentAllergy && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <Input
+              placeholder="Name"
+              value={currentAllergy.name}
+              onChange={(e) => setCurrentAllergy({ ...currentAllergy, name: e.target.value })}
+            />
+            <Input
+              placeholder="Code"
+              value={currentAllergy.code}
+              onChange={(e) => setCurrentAllergy({ ...currentAllergy, code: e.target.value })}
+            />
+            <Input
+              placeholder="Affect"
+              value={currentAllergy.affect}
+              onChange={(e) => setCurrentAllergy({ ...currentAllergy, affect: e.target.value })}
+            />
+            <Input
+              placeholder="Severity"
+              value={currentAllergy.severity}
+              onChange={(e) => setCurrentAllergy({ ...currentAllergy, severity: e.target.value })}
+            />
+            <Input.TextArea
+              placeholder="Description"
+              value={currentAllergy.description}
+              onChange={(e) => setCurrentAllergy({ ...currentAllergy, description: e.target.value })}
+              rows={3}
+            />
+            <Input
+              placeholder="Symptoms (comma separated)"
+              value={currentAllergy.symptoms?.join(', ')}
+              onChange={(e) =>
+                setCurrentAllergy({
+                  ...currentAllergy,
+                  symptoms: e.target.value.split(',').map(s => s.trim()),
+                })
+              }
+            />
+            <Input
+              placeholder="Triggers (comma separated)"
+              value={currentAllergy.triggers?.join(', ')}
+              onChange={(e) =>
+                setCurrentAllergy({
+                  ...currentAllergy,
+                  triggers: e.target.value.split(',').map(t => t.trim()),
+                })
+              }
+            />
+          </div>
+        )}
+      </DefaultModal>
     </div>
   );
 }

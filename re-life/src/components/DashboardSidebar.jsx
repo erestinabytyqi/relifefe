@@ -9,6 +9,7 @@ import {
   FileTextOutlined,
   HeartOutlined,
   MedicineBoxOutlined,
+  DashboardFilled,
 } from '@ant-design/icons';
 
 const { Sider } = Layout;
@@ -21,6 +22,7 @@ export default function DashboardSidebar() {
   if (loading) return null;
 
   const doctorMenu = [
+     { key: '/', icon: <DashboardFilled />, label: 'Dashboard' },
     { key: 'patients', icon: <UserOutlined />, label: 'Patient List' },
     { key: 'appointments', icon: <CalendarOutlined />, label: 'Appointments' },
     { key: 'reports', icon: <FileTextOutlined />, label: 'Reports' },
