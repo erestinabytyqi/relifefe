@@ -42,6 +42,8 @@ export default function AdminSidebar() {
       { key: 'getMedications', icon: <FileSearchOutlined />, label: 'Get Medications' },
       { key: 'diagnosis', icon: <FileAddOutlined />, label: 'Register Diagnosis' },
       { key: 'getDiagnosis', icon: <UnorderedListOutlined />, label: 'Get Diagnosis' },
+      { key: 'therapy', icon: <PlusSquareOutlined />, label: 'Register Therapy' },
+      { key: 'getTherapy', icon: <MedicineBoxOutlined />, label: 'Get Therapy' },
      ],
     },
     {
